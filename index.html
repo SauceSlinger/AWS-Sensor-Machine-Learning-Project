@@ -342,6 +342,11 @@
             25%, 75% { opacity: 0.4; }
         }
 
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         .alert-button:hover {
             background: #c82333;
             transform: scale(1.05);
@@ -571,6 +576,7 @@
                 ML-Powered Component Failure Risk Analysis
                 <span class="badge">AWS Serverless</span>
                 <span class="badge" style="background: #764ba2;">ML Predictions</span>
+                <span class="badge" id="connectionStatus" style="background: #6c757d;">⚪ Offline Mode</span>
             </p>
         </header>
 
@@ -889,6 +895,13 @@
 
                 const testData = await testResponse.json();
                 console.log('API Connection Test Response:', testData);
+                
+                // Update connection status badge
+                const statusBadge = document.getElementById('connectionStatus');
+                statusBadge.textContent = '🟢 Live - AWS Connected';
+                statusBadge.style.background = '#28a745';
+                statusBadge.style.animation = 'pulse 2s ease-in-out';
+                
                 showMessage('✅ API Connection Verified! Loading sensor data...', 'success');
 
                 // Generate 50 sensor readings and get ML predictions (reduced for faster loading)
@@ -1005,6 +1018,12 @@
                 
             } catch (error) {
                 console.error('API Error Details:', error);
+                
+                // Update connection status badge to offline
+                const statusBadge = document.getElementById('connectionStatus');
+                statusBadge.textContent = '🔴 Offline - Sample Data';
+                statusBadge.style.background = '#dc3545';
+                
                 showMessage(`❌ API Connection Failed: ${error.message}. Using offline sample data.`, 'error');
                 
                 // Fallback to sample data
