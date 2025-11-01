@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Data files (too large for git)
+*.csv
+raw_manufacturing_logs.csv
+
+# ML Models (will be regenerated)
+*.pkl
+failure_risk_model.pkl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Lambda deployment package
+lambda_deployment/
+*.zip
+
+# Logs
+*.log
