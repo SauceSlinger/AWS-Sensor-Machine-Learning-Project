@@ -865,18 +865,41 @@
 
         // Load data from AWS Lambda via API Gateway
         async function loadSampleData() {
-            showMessage('🔄 Loading data from AWS Lambda...', 'success');
+            showMessage('🔄 Connecting to AWS Lambda API...', 'success');
+            console.log('Starting API data load from:', API_GATEWAY_URL);
 
             try {
-                // Generate 100 sensor readings and get ML predictions
-                const records = [];
+                // Test API connection first
+                showMessage('🔌 Testing API connection...', 'success');
+                const testResponse = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sensor_id: 'CONNECTION-TEST',
+                        temperature: 85.0,
+                        vibration: 2.5,
+                        pressure: 98.0,
+                        speed: 1500
+                    })
+                });
+
+                if (!testResponse.ok) {
+                    throw new Error(`API returned status ${testResponse.status}`);
+                }
+
+                const testData = await testResponse.json();
+                console.log('API Connection Test Response:', testData);
+                showMessage('✅ API Connection Verified! Loading sensor data...', 'success');
+
+                // Generate 50 sensor readings and get ML predictions (reduced for faster loading)
                 const now = new Date();
                 let failedCount = 0;
+                let successfulAPICalls = 0;
                 
                 // Create batch of sensor data
                 const sensorPromises = [];
                 
-                for (let i = 0; i < 100; i++) {
+                for (let i = 0; i < 50; i++) {
                     let temp, vibration, pressure, speed;
                     
                     // Create 2-3 failing sensors with extreme values
@@ -906,13 +929,19 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(sensorData)
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+                            return response.json();
+                        })
                         .then(lambdaResponse => {
-                            // Parse the body if it's a string (API Gateway format)
+                            // Parse the body if it's a string (API Gateway proxy format)
                             const data = typeof lambdaResponse.body === 'string' 
                                 ? JSON.parse(lambdaResponse.body) 
                                 : lambdaResponse;
                             
+                            successfulAPICalls++;
                             const riskScore = data.risk_score;
                             const validationStatus = riskScore >= 0.7 ? 'FAIL' : 'PASS';
                             
@@ -927,21 +956,29 @@
                                 validation_status: validationStatus
                             };
                         })
+                        .catch(err => {
+                            console.error(`API call failed for ${sensorData.sensor_id}:`, err);
+                            throw err;
+                        })
                     );
                 }
+                
+                showMessage(`⏳ Processing ${sensorPromises.length} sensor predictions from AWS Lambda...`, 'success');
                 
                 // Wait for all predictions
                 const allResults = await Promise.all(sensorPromises);
                 
+                console.log(`Successfully received ${successfulAPICalls} predictions from AWS Lambda`);
+                
                 // Sort by risk score (highest first)
                 allResults.sort((a, b) => b.failure_risk_score - a.failure_risk_score);
                 
-                const passRate = ((100 - failedCount) / 100 * 100).toFixed(1);
+                const passRate = ((50 - failedCount) / 50 * 100).toFixed(1);
                 
                 const response = {
                     summary: {
-                        total_records: 100,
-                        passed: 100 - failedCount,
+                        total_records: 50,
+                        passed: 50 - failedCount,
                         failed: failedCount,
                         pass_rate: parseFloat(passRate)
                     },
@@ -964,11 +1001,11 @@
                     hideFailureAlert();
                 }
 
-                showMessage(`✅ Successfully loaded ${response.summary.total_records} records with ML predictions from AWS Lambda`, 'success');
+                showMessage(`🚀 SUCCESS! Loaded ${response.summary.total_records} records with REAL ML predictions from AWS Lambda (us-west-2)`, 'success');
                 
             } catch (error) {
-                console.error('API Error:', error);
-                showMessage('❌ Failed to load data from API. Using sample data instead.', 'error');
+                console.error('API Error Details:', error);
+                showMessage(`❌ API Connection Failed: ${error.message}. Using offline sample data.`, 'error');
                 
                 // Fallback to sample data
                 const sampleResponse = generateSampleData();
@@ -1153,13 +1190,13 @@
             }
         }
 
-        // Generate sample data for demonstration
+        // Generate sample data for demonstration (OFFLINE FALLBACK ONLY)
         function generateSampleData() {
             const records = [];
             const now = new Date();
             let failedCount = 0;
 
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 50; i++) {
                 let temp, vibration, validationStatus, riskScore;
                 
                 // Create 2-3 failing sensors with extreme values
@@ -1196,12 +1233,12 @@
             // Sort by risk score (highest first)
             records.sort((a, b) => b.failure_risk_score - a.failure_risk_score);
 
-            const passRate = ((100 - failedCount) / 100 * 100).toFixed(1);
+            const passRate = ((50 - failedCount) / 50 * 100).toFixed(1);
 
             return {
                 summary: {
-                    total_records: 100,
-                    passed: 100 - failedCount,
+                    total_records: 50,
+                    passed: 50 - failedCount,
                     failed: failedCount,
                     pass_rate: parseFloat(passRate)
                 },
