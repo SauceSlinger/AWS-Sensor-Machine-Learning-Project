@@ -101,6 +101,105 @@
             margin-top: 5px;
         }
 
+        /* Search Bar Styles */
+        .search-container {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: #999;
+            pointer-events: none;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #667eea;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-suggestions.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: #f8f9fa;
+        }
+
+        .suggestion-item .serial {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .suggestion-item .details {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .suggestion-item .risk-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .no-results {
+            padding: 15px 20px;
+            text-align: center;
+            color: #999;
+        }
+
         .controls {
             margin-bottom: 20px;
             display: flex;
@@ -182,7 +281,8 @@
 
         .chart-container {
             position: relative;
-            height: 400px;
+            height: 500px;
+            width: 100%;
         }
 
         .loading {
@@ -218,10 +318,253 @@
             font-size: 0.8em;
             opacity: 0.9;
         }
+
+        /* Alert Notification Styles */
+        .alert-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: blink 1.5s infinite;
+            display: none;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.4; }
+        }
+
+        .alert-button:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #dc3545;
+            padding: 20px 30px;
+            margin: 0;
+            background: white;
+            border-radius: 10px 10px 0 0;
+            flex-shrink: 0;
+        }
+
+        .modal-header h2 {
+            color: #dc3545;
+            margin: 0;
+        }
+
+        .modal-body-wrapper {
+            overflow-y: auto;
+            padding: 20px 30px;
+            flex-grow: 1;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .failure-detail {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .failure-detail h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .failure-detail p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .failure-detail.processed {
+            background: #e8f5e9;
+            border-left-color: #28a745;
+            opacity: 0.6;
+        }
+
+        .action-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .action-btn.primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .action-btn.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .action-btn.success:hover {
+            background: #218838;
+        }
+
+        .action-btn.warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .action-btn.warning:hover {
+            background: #e0a800;
+        }
+
+        .action-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .status-message {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .recommendations {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .recommendations h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .recommendations ul {
+            margin-left: 20px;
+        }
+
+        .recommendations li {
+            margin: 5px 0;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Alert Button (hidden by default) -->
+        <button id="alertButton" class="alert-button">
+            🚨 SENSOR FAILURE DETECTED
+        </button>
+
+        <!-- Failure Details Modal -->
+        <div id="failureModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h2>⚠️ Sensor Failure Alert</h2>
+                </div>
+                <div class="modal-body-wrapper">
+                    <div id="modalBody">
+                        <!-- Failure details will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <header>
             <h1>🤖 Intelligent Manufacturing Dashboard</h1>
             <p class="subtitle">
@@ -249,6 +592,22 @@
             <div class="stat-box">
                 <div class="stat-value" id="passRate">-</div>
                 <div class="stat-label">Pass Rate</div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <h2 style="margin-bottom: 15px; color: #333;">🔍 Search Components</h2>
+            <div class="search-wrapper">
+                <input 
+                    type="text" 
+                    id="sensorSearch" 
+                    class="search-input" 
+                    placeholder="Search by serial number (e.g., SN-100001)..." 
+                    autocomplete="off"
+                />
+                <span class="search-icon">🔎</span>
+                <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
         </div>
 
@@ -286,6 +645,8 @@
         let allRecords = [];
         let currentRecords = [];
         let riskChart = null;
+        let activeFailures = []; // Track unprocessed failures
+        let processedFailures = []; // Track processed failures
 
         // Initialize Chart.js
         const ctx = document.getElementById('riskChart').getContext('2d');
@@ -321,7 +682,7 @@
         }
 
         // Create/update chart
-        function updateChart(records) {
+        function updateChart(records, sortLabel = 'Risk Score') {
             const labels = records.slice(0, 50).map(r => r.serial_number);
             const riskScores = records.slice(0, 50).map(r => r.failure_risk_score);
             const temperatures = records.slice(0, 50).map(r => r.component_temp_C);
@@ -336,7 +697,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Failure Risk Score',
+                        label: `Failure Risk Score (${sortLabel})`,
                         data: riskScores,
                         backgroundColor: riskScores.map(score => 
                             score >= 0.7 ? 'rgba(220, 53, 69, 0.7)' :
@@ -348,18 +709,56 @@
                             score >= 0.4 ? 'rgba(255, 193, 7, 1)' :
                             'rgba(40, 167, 69, 1)'
                         ),
-                        borderWidth: 2
+                        borderWidth: 2,
+                        barPercentage: 0.9,
+                        categoryPercentage: 1.0
+                    },
+                    {
+                        label: 'Data Points',
+                        type: 'scatter',
+                        data: riskScores.map((score, index) => ({
+                            x: index,
+                            y: score
+                        })),
+                        backgroundColor: riskScores.map(score => 
+                            score >= 0.7 ? 'rgba(220, 53, 69, 1)' :
+                            score >= 0.4 ? 'rgba(255, 193, 7, 1)' :
+                            'rgba(40, 167, 69, 1)'
+                        ),
+                        borderColor: 'white',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointStyle: 'circle',
+                        showLine: false
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 10
+                        }
+                    },
                     plugins: {
                         legend: {
-                            display: true
+                            display: true,
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
                         },
                         tooltip: {
                             callbacks: {
+                                title: function(context) {
+                                    const index = context[0].dataIndex;
+                                    return labels[index];
+                                },
                                 afterLabel: function(context) {
                                     const index = context.dataIndex;
                                     return [
@@ -374,18 +773,36 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 1,
+                            max: Math.max(...riskScores) < 0.1 ? 0.1 : 1,
                             title: {
                                 display: true,
-                                text: 'Failure Risk Probability (0-1)'
+                                text: 'Failure Risk Probability (0-1)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
                             }
                         },
                         x: {
                             title: {
                                 display: true,
-                                text: 'Serial Number (Top 50 Components)'
+                                text: 'Components (Showing 50 of ' + records.length + ')',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
                             },
                             ticks: {
+                                display: false,
+                                maxRotation: 0,
+                                minRotation: 0
+                            },
+                            grid: {
                                 display: false
                             }
                         }
@@ -407,6 +824,7 @@
                             <th>Vibration</th>
                             <th>Risk Score</th>
                             <th>Risk Level</th>
+                            <th>Status</th>
                             <th>Timestamp</th>
                         </tr>
                     </thead>
@@ -416,14 +834,19 @@
             topRisks.forEach((record, index) => {
                 const riskClass = getRiskLevel(record.failure_risk_score);
                 const riskLabel = getRiskLabel(record.failure_risk_score);
+                const statusBadge = record.validation_status === 'FAIL' 
+                    ? '<span class="badge" style="background: #dc3545;">❌ FAIL</span>' 
+                    : '<span class="badge" style="background: #28a745;">✓ PASS</span>';
+                
                 html += `
-                    <tr>
+                    <tr ${record.validation_status === 'FAIL' ? 'style="background-color: #ffe6e6;"' : ''}>
                         <td><strong>${index + 1}</strong></td>
-                        <td>${record.serial_number}</td>
-                        <td>${record.component_temp_C}</td>
-                        <td>${record.vibration_level}</td>
+                        <td><strong>${record.serial_number}</strong></td>
+                        <td class="${record.component_temp_C > 120 ? 'risk-high' : ''}">${record.component_temp_C}°C</td>
+                        <td class="${record.vibration_level > 10 ? 'risk-high' : ''}">${record.vibration_level}</td>
                         <td class="${riskClass}">${record.failure_risk_score.toFixed(4)}</td>
                         <td class="${riskClass}">${riskLabel}</td>
+                        <td>${statusBadge}</td>
                         <td>${record.timestamp}</td>
                     </tr>
                 `;
@@ -449,26 +872,217 @@
             currentRecords = [...allRecords];
 
             updateStats(sampleResponse.summary);
-            updateChart(currentRecords);
+            updateChart(currentRecords, 'Highest Risk First (Default)');
             updateTopRiskTable(currentRecords);
 
+            // Show alert if there are failures
+            if (sampleResponse.failed_records && sampleResponse.failed_records.length > 0) {
+                showFailureAlert(sampleResponse.failed_records);
+            } else {
+                hideFailureAlert();
+            }
+
             showMessage(`✅ Successfully loaded ${sampleResponse.summary.total_records} records with ML predictions`, 'success');
+        }
+
+        // Show failure alert
+        function showFailureAlert(failedRecords) {
+            activeFailures = failedRecords.filter(f => !processedFailures.includes(f.serial_number));
+            
+            const alertBtn = document.getElementById('alertButton');
+            
+            if (activeFailures.length === 0) {
+                // All failures processed
+                alertBtn.style.display = 'block';
+                alertBtn.style.background = '#28a745';
+                alertBtn.style.animation = 'none';
+                alertBtn.textContent = `✅ ALL FAILURES PROCESSED - SYSTEM STABLE`;
+                alertBtn.onclick = () => showStatusSummary();
+            } else {
+                // Active failures remain
+                alertBtn.style.display = 'block';
+                alertBtn.style.background = '#dc3545';
+                alertBtn.style.animation = 'blink 1.5s infinite';
+                alertBtn.textContent = `🚨 ${activeFailures.length} ACTIVE FAILURE${activeFailures.length > 1 ? 'S' : ''} - ${processedFailures.length} PROCESSED`;
+                alertBtn.onclick = () => showFailureModal(failedRecords);
+            }
+        }
+
+        // Hide failure alert
+        function hideFailureAlert() {
+            document.getElementById('alertButton').style.display = 'none';
+        }
+
+        // Show status summary when all failures are processed
+        function showStatusSummary() {
+            const modal = document.getElementById('failureModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            let html = `
+                <div class="status-message success">
+                    <h3>✅ System Status: All Clear</h3>
+                    <p><strong>Total Failures Detected:</strong> ${processedFailures.length}</p>
+                    <p><strong>All failures have been acknowledged and processed.</strong></p>
+                    <p>Maintenance teams have been notified and corrective actions are in progress.</p>
+                    <ul style="margin-top: 15px;">
+                        <li>✓ Critical components isolated from production</li>
+                        <li>✓ Maintenance tickets created and assigned</li>
+                        <li>✓ Quality control teams notified</li>
+                        <li>✓ System monitoring active for similar patterns</li>
+                    </ul>
+                    <p style="margin-top: 15px; font-weight: bold;">Continue monitoring the dashboard for new alerts.</p>
+                </div>
+            `;
+            
+            modalBody.innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        // Process a specific failure
+        function processFailure(serialNumber) {
+            if (!processedFailures.includes(serialNumber)) {
+                processedFailures.push(serialNumber);
+            }
+            
+            // Mark the failure card as processed visually
+            const failureCard = document.querySelector(`[data-sensor="${serialNumber}"]`);
+            if (failureCard) {
+                failureCard.classList.add('processed');
+                const buttons = failureCard.querySelectorAll('.action-btn');
+                buttons.forEach(btn => btn.disabled = true);
+            }
+            
+            // Update alert button
+            const failedRecords = allRecords.filter(r => r.validation_status === 'FAIL');
+            showFailureAlert(failedRecords);
+            
+            // Show success message
+            showMessage(`✅ Sensor ${serialNumber} failure processed. Maintenance notified.`, 'success');
+        }
+
+        // Show failure modal with details
+        function showFailureModal(failedRecords) {
+            const modal = document.getElementById('failureModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            let html = '';
+            
+            failedRecords.forEach((record, index) => {
+                const isProcessed = processedFailures.includes(record.serial_number);
+                const tempExceed = record.component_temp_C > 120;
+                const vibExceed = record.vibration_level > 10;
+                
+                let failureReason = [];
+                if (tempExceed) failureReason.push(`Temperature: ${record.component_temp_C}°C exceeds maximum tolerance (120°C)`);
+                if (vibExceed) failureReason.push(`Vibration: ${record.vibration_level} exceeds maximum tolerance (10.0)`);
+                
+                html += `
+                    <div class="failure-detail ${isProcessed ? 'processed' : ''}" data-sensor="${record.serial_number}">
+                        <h3>${isProcessed ? '✅' : '🔴'} Sensor #${index + 1}: ${record.serial_number} ${isProcessed ? '(PROCESSED)' : ''}</h3>
+                        <p><strong>Timestamp:</strong> ${record.timestamp}</p>
+                        <p><strong>Current Readings:</strong></p>
+                        <ul>
+                            <li>Temperature: <span class="risk-high">${record.component_temp_C}°C</span> ${tempExceed ? '⚠️ CRITICAL' : ''}</li>
+                            <li>Vibration: <span class="risk-high">${record.vibration_level}</span> ${vibExceed ? '⚠️ CRITICAL' : ''}</li>
+                            <li>Risk Score: <span class="risk-indicator risk-high">${(record.failure_risk_score * 100).toFixed(1)}%</span></li>
+                        </ul>
+                        
+                        <p><strong>Failure Reason:</strong></p>
+                        <ul>
+                            ${failureReason.map(reason => `<li>${reason}</li>`).join('')}
+                        </ul>
+                        
+                        <div class="recommendations">
+                            <h3>⚡ Recommended Actions:</h3>
+                            <ul>
+                                <li><strong>IMMEDIATE:</strong> Isolate component ${record.serial_number} from production line</li>
+                                <li><strong>PRIORITY:</strong> Inspect for mechanical damage or thermal stress</li>
+                                <li><strong>INVESTIGATE:</strong> Review recent maintenance logs and operating conditions</li>
+                                <li><strong>PREVENTIVE:</strong> Check adjacent components for similar warning signs</li>
+                                <li><strong>REPORT:</strong> Notify maintenance team and quality control supervisor</li>
+                            </ul>
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>Potential Risks if Unaddressed:</strong></p>
+                        <ul>
+                            <li>🔥 Complete component failure leading to production shutdown</li>
+                            <li>⚙️ Damage to downstream equipment or assembly line</li>
+                            <li>💰 Costly emergency repairs and inventory losses</li>
+                            <li>⏱️ Extended downtime impacting delivery schedules</li>
+                            <li>⚠️ Safety hazards for operators near overheating equipment</li>
+                        </ul>
+                        
+                        <div class="action-buttons">
+                            <button class="action-btn primary" onclick="isolateComponent('${record.serial_number}')" ${isProcessed ? 'disabled' : ''}>
+                                🚫 Isolate Component
+                            </button>
+                            <button class="action-btn warning" onclick="createMaintenanceTicket('${record.serial_number}')" ${isProcessed ? 'disabled' : ''}>
+                                🔧 Create Maintenance Ticket
+                            </button>
+                            <button class="action-btn success" onclick="processFailure('${record.serial_number}')" ${isProcessed ? 'disabled' : ''}>
+                                ✅ Mark as Processed
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            modalBody.innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        // Action button handlers
+        function isolateComponent(serialNumber) {
+            showMessage(`🚫 Component ${serialNumber} isolated from production line. Operator notified.`, 'success');
+            // In real implementation, this would trigger API call to automation system
+        }
+
+        function createMaintenanceTicket(serialNumber) {
+            showMessage(`🔧 Maintenance ticket #MT-${Date.now().toString().slice(-6)} created for ${serialNumber}. Team assigned.`, 'success');
+            // In real implementation, this would create a ticket in maintenance system
+        }
+
+        // Close modal
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('failureModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('failureModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         }
 
         // Generate sample data for demonstration
         function generateSampleData() {
             const records = [];
             const now = new Date();
+            let failedCount = 0;
 
             for (let i = 0; i < 100; i++) {
-                const temp = 60 + Math.random() * 50; // 60-110°C
-                const vibration = 0.5 + Math.random() * 4; // 0.5-4.5
-
-                // Simple risk calculation (mimics ML model)
-                let riskScore = 0;
-                if (temp > 95) riskScore += (temp - 95) / 25;
-                if (vibration > 3.5) riskScore += (vibration - 3.5) / 2;
-                riskScore = Math.min(Math.max(riskScore, 0), 1);
+                let temp, vibration, validationStatus, riskScore;
+                
+                // Create 2-3 failing sensors with extreme values
+                if (i === 5 || i === 12 || i === 23) {
+                    // Critical failure conditions
+                    temp = 115 + Math.random() * 10; // 115-125°C (exceeds max tolerance)
+                    vibration = 8 + Math.random() * 2; // 8-10 (exceeds max tolerance)
+                    validationStatus = 'FAIL';
+                    riskScore = 1.0;
+                    failedCount++;
+                } else {
+                    // Normal operating conditions
+                    temp = 60 + Math.random() * 50; // 60-110°C
+                    vibration = 0.5 + Math.random() * 4; // 0.5-4.5
+                    validationStatus = 'PASS';
+                    
+                    // Simple risk calculation (mimics ML model)
+                    riskScore = 0;
+                    if (temp > 95) riskScore += (temp - 95) / 25;
+                    if (vibration > 3.5) riskScore += (vibration - 3.5) / 2;
+                    riskScore = Math.min(Math.max(riskScore, 0), 1);
+                }
 
                 records.push({
                     timestamp: new Date(now.getTime() - i * 600000).toISOString().slice(0, 19).replace('T', ' '),
@@ -476,21 +1090,24 @@
                     component_temp_C: parseFloat(temp.toFixed(1)),
                     vibration_level: parseFloat(vibration.toFixed(2)),
                     failure_risk_score: parseFloat(riskScore.toFixed(4)),
-                    validation_status: 'PASS'
+                    validation_status: validationStatus
                 });
             }
 
             // Sort by risk score (highest first)
             records.sort((a, b) => b.failure_risk_score - a.failure_risk_score);
 
+            const passRate = ((100 - failedCount) / 100 * 100).toFixed(1);
+
             return {
                 summary: {
                     total_records: 100,
-                    passed: 100,
-                    failed: 0,
-                    pass_rate: 100
+                    passed: 100 - failedCount,
+                    failed: failedCount,
+                    pass_rate: parseFloat(passRate)
                 },
                 validated_records: records,
+                failed_records: records.filter(r => r.validation_status === 'FAIL'),
                 top_risk_components: records.slice(0, 10)
             };
         }
@@ -500,16 +1117,19 @@
 
         document.getElementById('sortHighRisk').addEventListener('click', () => {
             currentRecords.sort((a, b) => b.failure_risk_score - a.failure_risk_score);
-            updateChart(currentRecords);
+            updateChart(currentRecords, 'Sorted: Highest Risk First');
             updateTopRiskTable(currentRecords);
             showMessage('📊 Sorted by highest risk first', 'success');
         });
 
         document.getElementById('sortLowRisk').addEventListener('click', () => {
+            console.log('Sort Low Risk clicked');
+            console.log('Before sort:', currentRecords.slice(0, 5).map(r => r.failure_risk_score));
             currentRecords.sort((a, b) => a.failure_risk_score - b.failure_risk_score);
-            updateChart(currentRecords);
+            console.log('After sort:', currentRecords.slice(0, 5).map(r => r.failure_risk_score));
+            updateChart(currentRecords, 'Sorted: Lowest Risk First');
             updateTopRiskTable(currentRecords);
-            showMessage('📊 Sorted by lowest risk first', 'success');
+            showMessage('📊 Sorted by lowest risk first - Showing safest components', 'success');
         });
 
         document.getElementById('filterHighRisk').addEventListener('click', () => {
@@ -518,7 +1138,7 @@
                 showMessage('⚠️ No high-risk components found', 'error');
                 currentRecords = [...allRecords];
             } else {
-                updateChart(currentRecords);
+                updateChart(currentRecords, 'Filtered: High Risk Only');
                 updateTopRiskTable(currentRecords);
                 showMessage(`🔴 Filtered to ${currentRecords.length} high-risk components`, 'success');
             }
@@ -526,10 +1146,96 @@
 
         document.getElementById('resetView').addEventListener('click', () => {
             currentRecords = [...allRecords];
-            updateChart(currentRecords);
+            updateChart(currentRecords, 'All Components');
             updateTopRiskTable(currentRecords);
             showMessage('↺ View reset to all records', 'success');
         });
+
+        // Search functionality
+        const searchInput = document.getElementById('sensorSearch');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.trim().toUpperCase();
+            
+            if (searchTerm.length === 0) {
+                searchSuggestions.classList.remove('active');
+                return;
+            }
+
+            // Filter records by serial number
+            const matches = allRecords.filter(record => 
+                record.serial_number.toUpperCase().includes(searchTerm)
+            ).slice(0, 10); // Limit to 10 suggestions
+
+            if (matches.length === 0) {
+                searchSuggestions.innerHTML = '<div class="no-results">No sensors found matching "' + searchTerm + '"</div>';
+                searchSuggestions.classList.add('active');
+                return;
+            }
+
+            // Build suggestions HTML
+            let html = '';
+            matches.forEach(record => {
+                const riskClass = getRiskLevel(record.failure_risk_score);
+                const riskLabel = getRiskLabel(record.failure_risk_score);
+                const statusIcon = record.validation_status === 'FAIL' ? '❌' : '✓';
+                
+                html += `
+                    <div class="suggestion-item" data-serial="${record.serial_number}">
+                        <div class="serial">${statusIcon} ${record.serial_number} 
+                            <span class="risk-badge ${riskClass}">${riskLabel}</span>
+                        </div>
+                        <div class="details">
+                            Temp: ${record.component_temp_C}°C | Vibration: ${record.vibration_level} | Risk: ${(record.failure_risk_score * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                `;
+            });
+
+            searchSuggestions.innerHTML = html;
+            searchSuggestions.classList.add('active');
+
+            // Add click handlers to suggestions
+            document.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const serialNumber = this.getAttribute('data-serial');
+                    selectSensor(serialNumber);
+                });
+            });
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                searchSuggestions.classList.remove('active');
+            }
+        });
+
+        // Select and highlight a specific sensor
+        function selectSensor(serialNumber) {
+            searchInput.value = serialNumber;
+            searchSuggestions.classList.remove('active');
+            
+            // Find the sensor in data
+            const sensor = allRecords.find(r => r.serial_number === serialNumber);
+            if (!sensor) return;
+            
+            // Filter to show just this sensor
+            currentRecords = [sensor];
+            updateChart(currentRecords, `Selected: ${serialNumber}`);
+            updateTopRiskTable(currentRecords);
+            
+            // Show sensor details
+            const riskLabel = getRiskLabel(sensor.failure_risk_score);
+            const statusIcon = sensor.validation_status === 'FAIL' ? '❌' : '✅';
+            showMessage(
+                `${statusIcon} ${serialNumber} - Risk: ${(sensor.failure_risk_score * 100).toFixed(1)}% (${riskLabel}) | ` +
+                `Temp: ${sensor.component_temp_C}°C | Vibration: ${sensor.vibration_level} | ` +
+                `Status: ${sensor.validation_status}`, 
+                sensor.validation_status === 'FAIL' ? 'error' : 'success'
+            );
+        }
 
         // Initial message
         showMessage('👋 Welcome! Click "Load Sample Data" to see ML predictions in action.', 'success');
