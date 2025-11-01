@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Connection Debug</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #fff; }
+        .log { margin: 5px 0; padding: 5px; background: #2d2d2d; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>AWS Lambda API Connection Debug</h1>
+    <button onclick="testConnection()">🧪 Test Connection</button>
+    <div id="logs"></div>
+
+    <script>
+        const API_URL = 'https://0wpit90c06.execute-api.us-west-2.amazonaws.com/prod/predict';
+        
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toISOString()}] ${msg}`;
+            document.getElementById('logs').appendChild(div);
+            console.log(msg);
+        }
+
+        async function testConnection() {
+            document.getElementById('logs').innerHTML = '';
+            log('Starting connection test...', 'info');
+            log('API URL: ' + API_URL, 'info');
+            
+            try {
+                log('Sending POST request...', 'info');
+                
+                const testData = {
+                    sensor_id: 'DEBUG-TEST',
+                    temperature: 85.0,
+                    vibration: 2.5,
+                    pressure: 98.0,
+                    speed: 1500
+                };
+                
+                log('Request body: ' + JSON.stringify(testData), 'info');
+                
+                const startTime = Date.now();
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                const endTime = Date.now();
+                
+                log(`Response received in ${endTime - startTime}ms`, 'info');
+                log('Response status: ' + response.status, response.ok ? 'success' : 'error');
+                log('Response ok: ' + response.ok, 'info');
+                
+                const responseText = await response.text();
+                log('Raw response: ' + responseText, 'info');
+                
+                const data = JSON.parse(responseText);
+                log('Parsed JSON: ' + JSON.stringify(data, null, 2), 'info');
+                
+                if (data.body) {
+                    const bodyData = JSON.parse(data.body);
+                    log('Parsed body: ' + JSON.stringify(bodyData, null, 2), 'success');
+                    log(`✅ SUCCESS! Risk Score: ${bodyData.risk_score}`, 'success');
+                    log(`✅ Risk Level: ${bodyData.risk_level}`, 'success');
+                } else {
+                    log('❌ No body field in response', 'error');
+                }
+                
+            } catch (error) {
+                log('❌ ERROR: ' + error.message, 'error');
+                log('Error stack: ' + error.stack, 'error');
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 500);
+        });
+    </script>
+</body>
+</html>
