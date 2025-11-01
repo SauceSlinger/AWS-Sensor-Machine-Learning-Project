@@ -860,29 +860,128 @@
             document.getElementById('topRiskTable').innerHTML = html;
         }
 
-        // Load sample data (simulated Lambda response)
-        function loadSampleData() {
-            showMessage('🔄 Loading data from Lambda simulation...', 'success');
+        // API Gateway URL
+        const API_GATEWAY_URL = 'https://0wpit90c06.execute-api.us-west-2.amazonaws.com/prod/predict';
 
-            // Simulate Lambda API call with sample data
-            // In production, this would be: fetch('YOUR_LAMBDA_API_URL')
-            const sampleResponse = generateSampleData();
+        // Load data from AWS Lambda via API Gateway
+        async function loadSampleData() {
+            showMessage('🔄 Loading data from AWS Lambda...', 'success');
 
-            allRecords = sampleResponse.validated_records;
-            currentRecords = [...allRecords];
+            try {
+                // Generate 100 sensor readings and get ML predictions
+                const records = [];
+                const now = new Date();
+                let failedCount = 0;
+                
+                // Create batch of sensor data
+                const sensorPromises = [];
+                
+                for (let i = 0; i < 100; i++) {
+                    let temp, vibration, pressure, speed;
+                    
+                    // Create 2-3 failing sensors with extreme values
+                    if (i === 5 || i === 12 || i === 23) {
+                        temp = 115 + Math.random() * 10;
+                        vibration = 8 + Math.random() * 2;
+                        pressure = 95 + Math.random() * 3;
+                        speed = 1400 + Math.random() * 100;
+                    } else {
+                        temp = 60 + Math.random() * 50;
+                        vibration = 0.5 + Math.random() * 4;
+                        pressure = 95 + Math.random() * 10;
+                        speed = 1400 + Math.random() * 200;
+                    }
+                    
+                    const sensorData = {
+                        sensor_id: `SN-${100000 + i}`,
+                        temperature: parseFloat(temp.toFixed(1)),
+                        vibration: parseFloat(vibration.toFixed(2)),
+                        pressure: parseFloat(pressure.toFixed(1)),
+                        speed: parseFloat(speed.toFixed(0))
+                    };
+                    
+                    sensorPromises.push(
+                        fetch(API_GATEWAY_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(sensorData)
+                        })
+                        .then(response => response.json())
+                        .then(lambdaResponse => {
+                            // Parse the body if it's a string (API Gateway format)
+                            const data = typeof lambdaResponse.body === 'string' 
+                                ? JSON.parse(lambdaResponse.body) 
+                                : lambdaResponse;
+                            
+                            const riskScore = data.risk_score;
+                            const validationStatus = riskScore >= 0.7 ? 'FAIL' : 'PASS';
+                            
+                            if (validationStatus === 'FAIL') failedCount++;
+                            
+                            return {
+                                timestamp: new Date(now.getTime() - i * 600000).toISOString().slice(0, 19).replace('T', ' '),
+                                serial_number: sensorData.sensor_id,
+                                component_temp_C: sensorData.temperature,
+                                vibration_level: sensorData.vibration,
+                                failure_risk_score: riskScore,
+                                validation_status: validationStatus
+                            };
+                        })
+                    );
+                }
+                
+                // Wait for all predictions
+                const allResults = await Promise.all(sensorPromises);
+                
+                // Sort by risk score (highest first)
+                allResults.sort((a, b) => b.failure_risk_score - a.failure_risk_score);
+                
+                const passRate = ((100 - failedCount) / 100 * 100).toFixed(1);
+                
+                const response = {
+                    summary: {
+                        total_records: 100,
+                        passed: 100 - failedCount,
+                        failed: failedCount,
+                        pass_rate: parseFloat(passRate)
+                    },
+                    validated_records: allResults,
+                    failed_records: allResults.filter(r => r.validation_status === 'FAIL'),
+                    top_risk_components: allResults.slice(0, 10)
+                };
 
-            updateStats(sampleResponse.summary);
-            updateChart(currentRecords, 'Highest Risk First (Default)');
-            updateTopRiskTable(currentRecords);
+                allRecords = response.validated_records;
+                currentRecords = [...allRecords];
 
-            // Show alert if there are failures
-            if (sampleResponse.failed_records && sampleResponse.failed_records.length > 0) {
-                showFailureAlert(sampleResponse.failed_records);
-            } else {
-                hideFailureAlert();
+                updateStats(response.summary);
+                updateChart(currentRecords, 'Highest Risk First (Default)');
+                updateTopRiskTable(currentRecords);
+
+                // Show alert if there are failures
+                if (response.failed_records && response.failed_records.length > 0) {
+                    showFailureAlert(response.failed_records);
+                } else {
+                    hideFailureAlert();
+                }
+
+                showMessage(`✅ Successfully loaded ${response.summary.total_records} records with ML predictions from AWS Lambda`, 'success');
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                showMessage('❌ Failed to load data from API. Using sample data instead.', 'error');
+                
+                // Fallback to sample data
+                const sampleResponse = generateSampleData();
+                allRecords = sampleResponse.validated_records;
+                currentRecords = [...allRecords];
+                updateStats(sampleResponse.summary);
+                updateChart(currentRecords, 'Highest Risk First (Default)');
+                updateTopRiskTable(currentRecords);
+                
+                if (sampleResponse.failed_records && sampleResponse.failed_records.length > 0) {
+                    showFailureAlert(sampleResponse.failed_records);
+                }
             }
-
-            showMessage(`✅ Successfully loaded ${sampleResponse.summary.total_records} records with ML predictions`, 'success');
         }
 
         // Show failure alert
