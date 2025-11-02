@@ -205,6 +205,49 @@
             color: #999;
         }
 
+        /* Tickets Button Styles */
+        .tickets-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tickets-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .ticket-badge {
+            background: #FFD700;
+            color: #333;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.85em;
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .ticket-badge.has-tickets {
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         .controls {
             margin-bottom: 20px;
             display: flex;
@@ -612,6 +655,121 @@
             margin: 5px 0;
             color: #856404;
         }
+
+        /* Ticket Filter Buttons */
+        .filter-btn {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Ticket Cards */
+        .ticket-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .ticket-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .ticket-card.resolved {
+            opacity: 0.7;
+            border-left-color: #28a745;
+        }
+
+        .ticket-card.critical {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .ticket-card.high {
+            border-left-color: #fd7e14;
+            background: #fff9f5;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .ticket-id {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .ticket-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .ticket-status.open {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .ticket-status.resolved {
+            background: #28a745;
+            color: white;
+        }
+
+        .ticket-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .ticket-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -650,6 +808,61 @@
             </div>
         </div>
 
+        <!-- Tickets Modal -->
+        <div id="ticketsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header" style="border-bottom-color: #667eea;">
+                    <span class="close" onclick="closeTicketsModal()">&times;</span>
+                    <h2 style="color: #667eea;">🎫 Maintenance Tickets</h2>
+                </div>
+                <div class="modal-body-wrapper">
+                    <div style="padding: 0 0 15px 0; display: flex; gap: 10px; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px;">
+                        <button onclick="filterTickets('all')" id="filterAll" class="filter-btn active">All (<span id="countAll">0</span>)</button>
+                        <button onclick="filterTickets('open')" id="filterOpen" class="filter-btn">Open (<span id="countOpen">0</span>)</button>
+                        <button onclick="filterTickets('resolved')" id="filterResolved" class="filter-btn">Resolved (<span id="countResolved">0</span>)</button>
+                    </div>
+                    <div id="ticketsBody">
+                        <!-- Tickets will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Ticket Form Modal -->
+        <div id="createTicketModal" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header" style="border-bottom-color: #667eea;">
+                    <span class="close" onclick="closeCreateTicketModal()">&times;</span>
+                    <h2 style="color: #667eea;">🎫 Create Maintenance Ticket</h2>
+                </div>
+                <div class="modal-body-wrapper">
+                    <form id="ticketForm" onsubmit="submitTicket(event)">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Sensor ID:</label>
+                            <input type="text" id="ticketSensorId" readonly style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; background: #f8f9fa; font-weight: bold;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Priority:</label>
+                            <select id="ticketPriority" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px;">
+                                <option value="critical">🔴 Critical</option>
+                                <option value="high">🟠 High</option>
+                                <option value="medium" selected>🟡 Medium</option>
+                                <option value="low">🟢 Low</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Issue Description:</label>
+                            <textarea id="ticketDescription" rows="4" required placeholder="Describe the issue and required maintenance..." style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="button" onclick="closeCreateTicketModal()" style="background: #6c757d;">Cancel</button>
+                            <button type="submit" style="background: #667eea;">Create Ticket</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <header>
             <h1>🤖 Intelligent Manufacturing Dashboard</h1>
             <p class="subtitle">
@@ -683,7 +896,12 @@
 
         <!-- Search Bar -->
         <div class="search-container">
-            <h2 style="margin-bottom: 15px; color: #333;">🔍 Search Components</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                <h2 style="margin: 0; color: #333;">🔍 Search Components</h2>
+                <button id="ticketsButton" class="tickets-button" onclick="showTicketsModal()">
+                    🎫 Tickets <span id="ticketBadge" class="ticket-badge">0</span>
+                </button>
+            </div>
             <div class="search-wrapper">
                 <input 
                     type="text" 
@@ -733,6 +951,9 @@
         let riskChart = null;
         let activeFailures = []; // Track unprocessed failures
         let processedFailures = []; // Track processed failures
+        let isolatedSensors = []; // Track isolated sensors
+        let maintenanceTickets = []; // Store all maintenance tickets
+        let ticketIdCounter = 1000; // Starting ticket ID
 
         // Initialize Chart.js
         const ctx = document.getElementById('riskChart').getContext('2d');
@@ -778,6 +999,32 @@
                 riskChart.destroy();
             }
 
+            // Create pattern for isolated sensors
+            const createStripedPattern = (color) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 10;
+                canvas.height = 10;
+                const ctx = canvas.getContext('2d');
+                
+                // Base color
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, 10, 10);
+                
+                // Diagonal stripes
+                ctx.strokeStyle = 'rgba(108, 117, 125, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(10, 10);
+                ctx.moveTo(-2, 0);
+                ctx.lineTo(0, 2);
+                ctx.moveTo(8, 0);
+                ctx.lineTo(10, 2);
+                ctx.stroke();
+                
+                return ctx.createPattern(canvas, 'repeat');
+            };
+
             riskChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -785,17 +1032,21 @@
                     datasets: [{
                         label: `Failure Risk Score (${sortLabel})`,
                         data: riskScores,
-                        backgroundColor: riskScores.map(score => 
-                            score >= 0.7 ? 'rgba(220, 53, 69, 0.7)' :
-                            score >= 0.4 ? 'rgba(255, 193, 7, 0.7)' :
-                            'rgba(40, 167, 69, 0.7)'
-                        ),
+                        backgroundColor: labels.map((label, index) => {
+                            const score = riskScores[index];
+                            const baseColor = score >= 0.7 ? 'rgba(220, 53, 69, 0.7)' :
+                                             score >= 0.4 ? 'rgba(255, 193, 7, 0.7)' :
+                                             'rgba(40, 167, 69, 0.7)';
+                            
+                            // Return pattern if isolated, otherwise solid color
+                            return isolatedSensors.includes(label) ? createStripedPattern(baseColor) : baseColor;
+                        }),
                         borderColor: riskScores.map(score => 
                             score >= 0.7 ? 'rgba(220, 53, 69, 1)' :
                             score >= 0.4 ? 'rgba(255, 193, 7, 1)' :
                             'rgba(40, 167, 69, 1)'
                         ),
-                        borderWidth: 2,
+                        borderWidth: labels.map(label => isolatedSensors.includes(label) ? 3 : 2),
                         barPercentage: 0.9,
                         categoryPercentage: 1.0
                     },
@@ -843,15 +1094,23 @@
                             callbacks: {
                                 title: function(context) {
                                     const index = context[0].dataIndex;
-                                    return labels[index];
+                                    const label = labels[index];
+                                    const isolated = isolatedSensors.includes(label) ? ' 🔒 ISOLATED' : '';
+                                    return label + isolated;
                                 },
                                 afterLabel: function(context) {
                                     const index = context.dataIndex;
-                                    return [
+                                    const lines = [
                                         `Temp: ${temperatures[index]}°C`,
                                         `Vibration: ${vibrations[index]}`,
                                         `Risk: ${getRiskLabel(riskScores[index])}`
                                     ];
+                                    
+                                    if (isolatedSensors.includes(labels[index])) {
+                                        lines.push('Status: ISOLATED - Ticket Required');
+                                    }
+                                    
+                                    return lines;
                                 }
                             }
                         }
@@ -920,14 +1179,24 @@
             topRisks.forEach((record, index) => {
                 const riskClass = getRiskLevel(record.failure_risk_score);
                 const riskLabel = getRiskLabel(record.failure_risk_score);
-                const statusBadge = record.validation_status === 'FAIL' 
-                    ? '<span class="badge" style="background: #dc3545;">❌ FAIL</span>' 
-                    : '<span class="badge" style="background: #28a745;">✓ PASS</span>';
+                const isIsolated = isolatedSensors.includes(record.serial_number);
+                const isProcessed = processedFailures.includes(record.serial_number);
+                
+                let statusBadge = '';
+                if (isProcessed) {
+                    statusBadge = '<span class="badge" style="background: #28a745;">✅ PROCESSED</span>';
+                } else if (isIsolated) {
+                    statusBadge = '<span class="badge" style="background: #6c757d;">🔒 ISOLATED</span>';
+                } else if (record.validation_status === 'FAIL') {
+                    statusBadge = '<span class="badge" style="background: #dc3545;">❌ FAIL</span>';
+                } else {
+                    statusBadge = '<span class="badge" style="background: #28a745;">✓ PASS</span>';
+                }
                 
                 html += `
-                    <tr ${record.validation_status === 'FAIL' ? 'style="background-color: #ffe6e6;"' : ''}>
+                    <tr ${record.validation_status === 'FAIL' && !isProcessed ? 'style="background-color: #ffe6e6;"' : ''}>
                         <td><strong>${index + 1}</strong></td>
-                        <td><strong>${record.serial_number}</strong></td>
+                        <td><strong>${record.serial_number}</strong>${isIsolated ? ' 🔒' : ''}</td>
                         <td class="${record.component_temp_C > 120 ? 'risk-high' : ''}">${record.component_temp_C}°C</td>
                         <td class="${record.vibration_level > 10 ? 'risk-high' : ''}">${record.vibration_level}</td>
                         <td class="${riskClass}">${record.failure_risk_score.toFixed(4)}</td>
@@ -1297,18 +1566,212 @@
         function createMassIncident() {
             if (!activeFailures || activeFailures.length === 0) return;
             
-            const incidentId = 'INC-' + Date.now();
-            showMessage(`🎫 MASS INCIDENT CREATED: ${incidentId} for ${activeFailures.length} critical failures`, 'success');
-            console.log(`📋 Created mass incident ${incidentId} covering sensors: ${activeFailures.map(f => f.serial_number).join(', ')}`);
-            
-            // Mark all as processed
+            // Create individual tickets for each critical failure
             activeFailures.forEach(failure => {
-                if (!processedFailures.includes(failure.serial_number)) {
-                    processedFailures.push(failure.serial_number);
-                }
+                createTicketForSensor(failure.serial_number, 'critical', 'BLACK SWAN EVENT: Critical failure requiring immediate attention');
             });
             
-            showFailureAlert([]); // Update UI
+            showMessage(`🎫 ${activeFailures.length} CRITICAL TICKETS CREATED for black swan event`, 'success');
+            console.log(`📋 Created ${activeFailures.length} critical tickets for sensors: ${activeFailures.map(f => f.serial_number).join(', ')}`);
+            updateTicketBadge();
+        }
+
+        // Tickets Modal Functions
+        function showTicketsModal() {
+            const modal = document.getElementById('ticketsModal');
+            renderTickets('all');
+            modal.style.display = 'block';
+        }
+
+        function closeTicketsModal() {
+            document.getElementById('ticketsModal').style.display = 'none';
+        }
+
+        function filterTickets(filter) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add('active');
+            
+            renderTickets(filter);
+        }
+
+        function renderTickets(filter) {
+            const ticketsBody = document.getElementById('ticketsBody');
+            let tickets = maintenanceTickets;
+            
+            // Apply filter
+            if (filter === 'open') {
+                tickets = tickets.filter(t => t.status === 'open');
+            } else if (filter === 'resolved') {
+                tickets = tickets.filter(t => t.status === 'resolved');
+            }
+            
+            // Update counts
+            document.getElementById('countAll').textContent = maintenanceTickets.length;
+            document.getElementById('countOpen').textContent = maintenanceTickets.filter(t => t.status === 'open').length;
+            document.getElementById('countResolved').textContent = maintenanceTickets.filter(t => t.status === 'resolved').length;
+            
+            if (tickets.length === 0) {
+                ticketsBody.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p><strong>No ${filter !== 'all' ? filter : ''} tickets found</strong></p>
+                        <p style="color: #999; font-size: 0.9em;">Tickets will appear here when maintenance requests are created</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by timestamp (newest first)
+            tickets.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            let html = tickets.map(ticket => {
+                const priorityEmoji = {
+                    'critical': '🔴',
+                    'high': '🟠',
+                    'medium': '🟡',
+                    'low': '🟢'
+                };
+                
+                return `
+                    <div class="ticket-card ${ticket.status} ${ticket.priority}">
+                        <div class="ticket-header">
+                            <span class="ticket-id">${ticket.id}</span>
+                            <span class="ticket-status ${ticket.status}">${ticket.status.toUpperCase()}</span>
+                        </div>
+                        <div class="ticket-info">
+                            <div><strong>Sensor:</strong> ${ticket.sensor_id}</div>
+                            <div><strong>Priority:</strong> ${priorityEmoji[ticket.priority]} ${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}</div>
+                            <div><strong>Created:</strong> ${new Date(ticket.timestamp).toLocaleString()}</div>
+                            <div><strong>Assigned To:</strong> ${ticket.assigned_to}</div>
+                        </div>
+                        <div class="ticket-description">
+                            <strong>Issue:</strong><br>
+                            ${ticket.description}
+                        </div>
+                        ${ticket.status === 'open' ? `
+                            <div class="ticket-actions">
+                                <button class="action-btn success" onclick="resolveTicket('${ticket.id}')">✅ Resolve & Process</button>
+                                <button class="action-btn primary" onclick="viewSensorDetails('${ticket.sensor_id}')">📊 View Sensor</button>
+                            </div>
+                        ` : `
+                            <div style="color: #28a745; font-weight: 600; margin-top: 10px;">
+                                ✅ Resolved at ${new Date(ticket.resolved_at).toLocaleString()}
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+            
+            ticketsBody.innerHTML = html;
+        }
+
+        function updateTicketBadge() {
+            const badge = document.getElementById('ticketBadge');
+            const openTickets = maintenanceTickets.filter(t => t.status === 'open').length;
+            badge.textContent = openTickets;
+            
+            if (openTickets > 0) {
+                badge.classList.add('has-tickets');
+            } else {
+                badge.classList.remove('has-tickets');
+            }
+        }
+
+        // Create Ticket Functions
+        function openCreateTicketModal(sensorId) {
+            document.getElementById('ticketSensorId').value = sensorId;
+            document.getElementById('ticketDescription').value = '';
+            
+            // Set priority based on sensor risk
+            const sensor = allRecords.find(r => r.serial_number === sensorId);
+            if (sensor) {
+                const priority = sensor.failure_risk_score >= 0.7 ? 'critical' :
+                                sensor.failure_risk_score >= 0.4 ? 'high' :
+                                sensor.failure_risk_score >= 0.2 ? 'medium' : 'low';
+                document.getElementById('ticketPriority').value = priority;
+            }
+            
+            document.getElementById('createTicketModal').style.display = 'block';
+        }
+
+        function closeCreateTicketModal() {
+            document.getElementById('createTicketModal').style.display = 'none';
+        }
+
+        function submitTicket(event) {
+            event.preventDefault();
+            
+            const sensorId = document.getElementById('ticketSensorId').value;
+            const priority = document.getElementById('ticketPriority').value;
+            const description = document.getElementById('ticketDescription').value;
+            
+            createTicketForSensor(sensorId, priority, description);
+            
+            closeCreateTicketModal();
+            showMessage(`✅ Maintenance ticket created for ${sensorId}`, 'success');
+        }
+
+        function createTicketForSensor(sensorId, priority, description) {
+            const ticket = {
+                id: `TICKET-${ticketIdCounter++}`,
+                sensor_id: sensorId,
+                priority: priority,
+                description: description,
+                status: 'open',
+                timestamp: new Date().toISOString(),
+                assigned_to: 'Maintenance Team',
+                resolved_at: null
+            };
+            
+            maintenanceTickets.push(ticket);
+            updateTicketBadge();
+            console.log(`🎫 Created ticket ${ticket.id} for sensor ${sensorId}`);
+        }
+
+        function resolveTicket(ticketId) {
+            const ticket = maintenanceTickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+            
+            ticket.status = 'resolved';
+            ticket.resolved_at = new Date().toISOString();
+            
+            // Mark sensor as processed
+            if (!processedFailures.includes(ticket.sensor_id)) {
+                processedFailures.push(ticket.sensor_id);
+            }
+            
+            // Remove from isolated sensors
+            const isolatedIndex = isolatedSensors.indexOf(ticket.sensor_id);
+            if (isolatedIndex > -1) {
+                isolatedSensors.splice(isolatedIndex, 1);
+            }
+            
+            // Update UI
+            renderTickets(document.querySelector('.filter-btn.active').id.replace('filter', '').toLowerCase());
+            updateTicketBadge();
+            showMessage(`✅ Ticket ${ticketId} resolved and sensor ${ticket.sensor_id} processed`, 'success');
+            
+            // Update failure alert
+            const failedRecords = allRecords.filter(r => r.validation_status === 'FAIL');
+            showFailureAlert(failedRecords);
+            
+            // Update chart to remove stripes
+            updateChart(currentRecords, getCurrentSortMode());
+        }
+
+        function getCurrentSortMode() {
+            // Determine current sort mode from UI or default
+            return 'Highest Risk First (Default)';
+        }
+
+        function viewSensorDetails(sensorId) {
+            // Highlight sensor in table and scroll to it
+            const searchInput = document.getElementById('sensorSearch');
+            searchInput.value = sensorId;
+            searchInput.dispatchEvent(new Event('input'));
+            closeTicketsModal();
+            showMessage(`📊 Showing details for ${sensorId}`, 'success');
         }
 
         // Show status summary when all failures are processed
@@ -1414,11 +1877,8 @@
                             <button class="action-btn primary" onclick="isolateComponent('${record.serial_number}')" ${isProcessed ? 'disabled' : ''}>
                                 🚫 Isolate Component
                             </button>
-                            <button class="action-btn warning" onclick="createMaintenanceTicket('${record.serial_number}')" ${isProcessed ? 'disabled' : ''}>
+                            <button class="action-btn warning" onclick="openCreateTicketModal('${record.serial_number}')" ${isProcessed ? 'disabled' : ''}>
                                 🔧 Create Maintenance Ticket
-                            </button>
-                            <button class="action-btn success" onclick="processFailure('${record.serial_number}')" ${isProcessed ? 'disabled' : ''}>
-                                ✅ Mark as Processed
                             </button>
                         </div>
                     </div>
@@ -1431,13 +1891,23 @@
 
         // Action button handlers
         function isolateComponent(serialNumber) {
-            showMessage(`🚫 Component ${serialNumber} isolated from production line. Operator notified.`, 'success');
-            // In real implementation, this would trigger API call to automation system
-        }
-
-        function createMaintenanceTicket(serialNumber) {
-            showMessage(`🔧 Maintenance ticket #MT-${Date.now().toString().slice(-6)} created for ${serialNumber}. Team assigned.`, 'success');
-            // In real implementation, this would create a ticket in maintenance system
+            // Add to isolated sensors list
+            if (!isolatedSensors.includes(serialNumber)) {
+                isolatedSensors.push(serialNumber);
+            }
+            
+            showMessage(`🚫 Component ${serialNumber} isolated from production line. Create a maintenance ticket to process this sensor.`, 'success');
+            console.log(`🔒 Isolated sensor ${serialNumber} from production`);
+            
+            // Update chart to show stripes
+            updateChart(currentRecords, getCurrentSortMode());
+            
+            // Show prompt to create ticket
+            setTimeout(() => {
+                if (confirm(`Sensor ${serialNumber} is now isolated. Would you like to create a maintenance ticket?`)) {
+                    openCreateTicketModal(serialNumber);
+                }
+            }, 500);
         }
 
         // Close modal
