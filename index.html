@@ -959,12 +959,8 @@
                             }
                             return response.json();
                         })
-                        .then(lambdaResponse => {
-                            // Parse the body if it's a string (API Gateway proxy format)
-                            const data = typeof lambdaResponse.body === 'string' 
-                                ? JSON.parse(lambdaResponse.body) 
-                                : lambdaResponse;
-                            
+                        .then(data => {
+                            // With Lambda Proxy Integration, response is direct JSON (not wrapped)
                             successfulAPICalls++;
                             const riskScore = data.risk_score;
                             const validationStatus = riskScore >= 0.7 ? 'FAIL' : 'PASS';

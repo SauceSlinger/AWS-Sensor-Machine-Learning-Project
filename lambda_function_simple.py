@@ -28,17 +28,27 @@ def predict_failure_risk(temperature, vibration, pressure, speed):
 def lambda_handler(event, context):
     """AWS Lambda handler function"""
     try:
-        # Parse input
-        if isinstance(event, str):
+        # Parse input - handle both direct invocation and API Gateway proxy format
+        if 'body' in event:
+            # API Gateway proxy integration - body is a JSON string
+            data = json.loads(event['body']) if isinstance(event['body'], str) else event['body']
+        elif isinstance(event, str):
+            # Direct string input
             data = json.loads(event)
         else:
+            # Direct dict input
             data = event
+        
+        # Debug logging (will appear in CloudWatch)
+        print(f"Parsed data: {data}")
             
         # Extract sensor readings
         temperature = float(data.get('temperature', 0))
         vibration = float(data.get('vibration', 0))
         pressure = float(data.get('pressure', 0))
         speed = float(data.get('speed', 0))
+        
+        print(f"Extracted values - temp: {temperature}, vib: {vibration}, pressure: {pressure}, speed: {speed}")
         
         # Validate inputs
         if temperature <= 0 or vibration <= 0:
