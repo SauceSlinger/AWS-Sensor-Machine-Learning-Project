@@ -1234,6 +1234,14 @@
                         data: riskScores,
                         backgroundColor: labels.map((label, index) => {
                             const score = riskScores[index];
+                            
+                            // If sensor is processed, show it as green (resolved)
+                            if (processedFailures.includes(label)) {
+                                const baseColor = 'rgba(40, 167, 69, 0.5)'; // Green with transparency
+                                return isolatedSensors.includes(label) ? createStripedPattern(baseColor) : baseColor;
+                            }
+                            
+                            // Otherwise use risk-based coloring
                             const baseColor = score >= 0.7 ? 'rgba(220, 53, 69, 0.7)' :
                                              score >= 0.4 ? 'rgba(255, 193, 7, 0.7)' :
                                              'rgba(40, 167, 69, 0.7)';
@@ -1241,11 +1249,19 @@
                             // Return pattern if isolated, otherwise solid color
                             return isolatedSensors.includes(label) ? createStripedPattern(baseColor) : baseColor;
                         }),
-                        borderColor: riskScores.map(score => 
-                            score >= 0.7 ? 'rgba(220, 53, 69, 1)' :
-                            score >= 0.4 ? 'rgba(255, 193, 7, 1)' :
-                            'rgba(40, 167, 69, 1)'
-                        ),
+                        borderColor: riskScores.map((score, index) => {
+                            const label = labels[index];
+                            
+                            // Processed sensors get green border
+                            if (processedFailures.includes(label)) {
+                                return 'rgba(40, 167, 69, 1)';
+                            }
+                            
+                            // Otherwise use risk-based border color
+                            return score >= 0.7 ? 'rgba(220, 53, 69, 1)' :
+                                   score >= 0.4 ? 'rgba(255, 193, 7, 1)' :
+                                   'rgba(40, 167, 69, 1)';
+                        }),
                         borderWidth: labels.map(label => isolatedSensors.includes(label) ? 3 : 2),
                         barPercentage: 0.9,
                         categoryPercentage: 1.0
@@ -1257,11 +1273,19 @@
                             x: index,
                             y: score
                         })),
-                        backgroundColor: riskScores.map(score => 
-                            score >= 0.7 ? 'rgba(220, 53, 69, 1)' :
-                            score >= 0.4 ? 'rgba(255, 193, 7, 1)' :
-                            'rgba(40, 167, 69, 1)'
-                        ),
+                        backgroundColor: riskScores.map((score, index) => {
+                            const label = labels[index];
+                            
+                            // Processed sensors get green points
+                            if (processedFailures.includes(label)) {
+                                return 'rgba(40, 167, 69, 1)';
+                            }
+                            
+                            // Otherwise use risk-based color
+                            return score >= 0.7 ? 'rgba(220, 53, 69, 1)' :
+                                   score >= 0.4 ? 'rgba(255, 193, 7, 1)' :
+                                   'rgba(40, 167, 69, 1)';
+                        }),
                         borderColor: 'white',
                         borderWidth: 2,
                         pointRadius: 5,
@@ -1296,18 +1320,22 @@
                                 title: function(context) {
                                     const index = context[0].dataIndex;
                                     const label = labels[index];
+                                    const processed = processedFailures.includes(label) ? ' ✅ PROCESSED' : '';
                                     const isolated = isolatedSensors.includes(label) ? ' 🔒 ISOLATED' : '';
-                                    return label + isolated;
+                                    return label + processed + isolated;
                                 },
                                 afterLabel: function(context) {
                                     const index = context.dataIndex;
+                                    const sensorLabel = labels[index];
                                     const lines = [
                                         `Temp: ${temperatures[index]}°C`,
                                         `Vibration: ${vibrations[index]}`,
                                         `Risk: ${getRiskLabel(riskScores[index])}`
                                     ];
                                     
-                                    if (isolatedSensors.includes(labels[index])) {
+                                    if (processedFailures.includes(sensorLabel)) {
+                                        lines.push('Status: PROCESSED - Ticket Resolved');
+                                    } else if (isolatedSensors.includes(sensorLabel)) {
                                         lines.push('Status: ISOLATED - Ticket Required');
                                     }
                                     
@@ -1956,17 +1984,23 @@
                 isolatedSensors.splice(isolatedIndex, 1);
             }
             
-            // Update UI
+            // Remove from activeFailures by recalculating
+            const failedRecords = allRecords.filter(r => r.validation_status === 'FAIL');
+            activeFailures = failedRecords.filter(f => !processedFailures.includes(f.serial_number));
+            
+            // Update all UI components
             renderTickets(document.querySelector('.filter-btn.active').id.replace('filter', '').toLowerCase());
             updateTicketBadge();
             showMessage(`✅ Ticket ${ticketId} resolved and sensor ${ticket.sensor_id} processed`, 'success');
             
-            // Update failure alert
-            const failedRecords = allRecords.filter(r => r.validation_status === 'FAIL');
+            // Update failure alert and banner
             showFailureAlert(failedRecords);
             
-            // Update chart to remove stripes
+            // Update chart to remove the red bar and stripes
             updateChart(currentRecords, getCurrentSortMode());
+            
+            // Update the risk table to reflect processed status
+            updateTopRiskTable(currentRecords);
         }
 
         function getCurrentSortMode() {
