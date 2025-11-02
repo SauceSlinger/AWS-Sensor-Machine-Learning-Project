@@ -6,6 +6,103 @@
     <title>Manufacturing Risk Dashboard - ML Operations</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        /* CSS Custom Properties for Theming */
+        :root {
+            /* Light Theme Colors */
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            
+            --primary-color: #667eea;
+            --primary-hover: #5568d3;
+            --primary-shadow: rgba(102, 126, 234, 0.3);
+            --primary-shadow-hover: rgba(102, 126, 234, 0.4);
+            
+            --border-color: #e0e0e0;
+            --border-light: #ddd;
+            --border-focus: #667eea;
+            
+            --stat-box-bg: #f8f9fa;
+            --hover-bg: #f8f9fa;
+            
+            --success-color: #28a745;
+            --success-hover: #218838;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --secondary-color: #6c757d;
+            --secondary-hover: #5a6268;
+            
+            --modal-overlay: rgba(0, 0, 0, 0.5);
+            --modal-bg: white;
+            
+            --input-bg: white;
+            --input-text: #333;
+            
+            --chart-grid: rgba(0, 0, 0, 0.1);
+            --chart-text: #666;
+            
+            --badge-success-bg: #28a745;
+            --badge-warning-bg: #ffc107;
+            --badge-danger-bg: #dc3545;
+            --badge-secondary-bg: #6c757d;
+            --badge-text-dark: #333;
+            --badge-text-light: white;
+        }
+
+        /* Dark Theme Colors */
+        body.dark-theme {
+            --bg-gradient-start: #1a1a2e;
+            --bg-gradient-end: #16213e;
+            --text-primary: #e4e4e4;
+            --text-secondary: #b8b8b8;
+            --text-tertiary: #888;
+            
+            --card-bg: #2a2a3e;
+            --card-shadow: rgba(0, 0, 0, 0.3);
+            
+            --primary-color: #7c8fe8;
+            --primary-hover: #6a7dd6;
+            --primary-shadow: rgba(124, 143, 232, 0.3);
+            --primary-shadow-hover: rgba(124, 143, 232, 0.4);
+            
+            --border-color: #3a3a4e;
+            --border-light: #3a3a4e;
+            --border-focus: #7c8fe8;
+            
+            --stat-box-bg: #1e1e2e;
+            --hover-bg: #3a3a4e;
+            
+            --success-color: #2ecc71;
+            --success-hover: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --secondary-color: #7f8c8d;
+            --secondary-hover: #95a5a6;
+            
+            --modal-overlay: rgba(0, 0, 0, 0.7);
+            --modal-bg: #2a2a3e;
+            
+            --input-bg: #1e1e2e;
+            --input-text: #e4e4e4;
+            
+            --chart-grid: rgba(255, 255, 255, 0.1);
+            --chart-text: #b8b8b8;
+            
+            --badge-success-bg: #2ecc71;
+            --badge-warning-bg: #f39c12;
+            --badge-danger-bg: #e74c3c;
+            --badge-secondary-bg: #7f8c8d;
+            --badge-text-dark: #1a1a2e;
+            --badge-text-light: #e4e4e4;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,10 +111,11 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-primary);
             padding: 20px;
             min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
@@ -31,28 +129,29 @@
         }
 
         header {
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--card-shadow);
             margin-bottom: 30px;
+            transition: background 0.3s, box-shadow 0.3s;
         }
 
         h1 {
-            color: #667eea;
+            color: var(--primary-color);
             font-size: 2.5em;
             margin-bottom: 10px;
         }
 
         .subtitle {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 1.1em;
         }
 
         .badge {
             display: inline-block;
             padding: 5px 15px;
-            background: #4CAF50;
+            background: var(--success-color);
             color: white;
             border-radius: 20px;
             font-size: 0.9em;
@@ -67,14 +166,15 @@
         }
 
         .card {
-            background: white;
+            background: var(--card-bg);
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--card-shadow);
+            transition: background 0.3s, box-shadow 0.3s;
         }
 
         .card h2 {
-            color: #667eea;
+            color: var(--primary-color);
             margin-bottom: 20px;
             font-size: 1.5em;
         }
@@ -87,32 +187,34 @@
         }
 
         .stat-box {
-            background: #f8f9fa;
+            background: var(--stat-box-bg);
             padding: 20px;
             border-radius: 8px;
             text-align: center;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid var(--primary-color);
+            transition: background 0.3s;
         }
 
         .stat-value {
             font-size: 2.5em;
             font-weight: bold;
-            color: #667eea;
+            color: var(--primary-color);
         }
 
         .stat-label {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9em;
             margin-top: 5px;
         }
 
         /* Search Bar Styles */
         .search-container {
-            background: white;
+            background: var(--card-bg);
             padding: 20px 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--card-shadow);
             margin-bottom: 30px;
+            transition: background 0.3s, box-shadow 0.3s;
         }
 
         .search-wrapper {
@@ -124,14 +226,16 @@
             width: 100%;
             padding: 15px 50px 15px 20px;
             font-size: 1.1em;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, background 0.3s, color 0.3s;
+            background: var(--input-bg);
+            color: var(--input-text);
         }
 
         .search-input:focus {
-            border-color: #667eea;
+            border-color: var(--border-focus);
         }
 
         .search-icon {
@@ -140,7 +244,7 @@
             top: 50%;
             transform: translateY(-50%);
             font-size: 1.5em;
-            color: #999;
+            color: var(--text-tertiary);
             pointer-events: none;
         }
 
@@ -149,15 +253,16 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: white;
-            border: 2px solid #667eea;
+            background: var(--card-bg);
+            border: 2px solid var(--border-focus);
             border-top: none;
             border-radius: 0 0 8px 8px;
             max-height: 300px;
             overflow-y: auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--card-shadow);
             z-index: 1000;
             display: none;
+            transition: background 0.3s;
         }
 
         .search-suggestions.active {
@@ -167,7 +272,7 @@
         .suggestion-item {
             padding: 12px 20px;
             cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--border-light);
             transition: background 0.2s;
         }
 
@@ -176,17 +281,17 @@
         }
 
         .suggestion-item:hover {
-            background: #f8f9fa;
+            background: var(--hover-bg);
         }
 
         .suggestion-item .serial {
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .suggestion-item .details {
             font-size: 0.9em;
-            color: #666;
+            color: var(--text-secondary);
             margin-top: 3px;
         }
 
@@ -202,12 +307,12 @@
         .no-results {
             padding: 15px 20px;
             text-align: center;
-            color: #999;
+            color: var(--text-tertiary);
         }
 
         /* Tickets Button Styles */
         .tickets-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--bg-gradient-end) 100%);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -215,7 +320,7 @@
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 6px var(--primary-shadow);
             transition: all 0.3s;
             position: relative;
             display: flex;
@@ -225,12 +330,12 @@
 
         .tickets-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 12px var(--primary-shadow-hover);
         }
 
         .ticket-badge {
             background: #FFD700;
-            color: #333;
+            color: var(--badge-text-dark);
             border-radius: 12px;
             padding: 2px 8px;
             font-size: 0.85em;
@@ -248,6 +353,28 @@
             50% { transform: scale(1.1); }
         }
 
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px var(--card-shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(20deg) scale(1.1);
+            box-shadow: 0 4px 8px var(--card-shadow);
+        }
+
         .controls {
             margin-bottom: 20px;
             display: flex;
@@ -256,7 +383,7 @@
         }
 
         button {
-            background: #667eea;
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -267,23 +394,23 @@
         }
 
         button:hover {
-            background: #5568d3;
+            background: var(--primary-hover);
         }
 
         button.secondary {
-            background: #6c757d;
+            background: var(--secondary-color);
         }
 
         button.secondary:hover {
-            background: #5a6268;
+            background: var(--secondary-hover);
         }
 
         #loadData {
-            background: #28a745;
+            background: var(--success-color);
         }
 
         #loadData:hover {
-            background: #218838;
+            background: var(--success-hover);
         }
 
         table {
@@ -295,31 +422,40 @@
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-light);
+            transition: border-color 0.3s;
         }
 
         th {
-            background: #f8f9fa;
-            color: #667eea;
+            background: var(--stat-box-bg);
+            color: var(--text-primary);
             font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        th {
+            background: var(--stat-box-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+            transition: background 0.3s, color 0.3s;
         }
 
         tr:hover {
-            background: #f8f9fa;
+            background: var(--hover-bg);
         }
 
         .risk-high {
-            color: #dc3545;
+            color: var(--danger-color);
             font-weight: bold;
         }
 
         .risk-medium {
-            color: #ffc107;
+            color: var(--warning-color);
             font-weight: bold;
         }
 
         .risk-low {
-            color: #28a745;
+            color: var(--success-color);
             font-weight: bold;
         }
 
@@ -336,23 +472,27 @@
         .loading {
             text-align: center;
             padding: 40px;
-            color: #666;
+            color: var(--text-secondary);
         }
 
         .error {
-            background: #f8d7da;
-            color: #721c24;
+            background: var(--danger-color);
+            color: white;
             padding: 15px;
             border-radius: 6px;
-            border-left: 4px solid #dc3545;
+            border-left: 4px solid var(--danger-color);
+            opacity: 0.9;
+            transition: background 0.3s;
         }
 
         .success {
-            background: #d4edda;
-            color: #155724;
+            background: var(--success-color);
+            color: white;
             padding: 15px;
             border-radius: 6px;
-            border-left: 4px solid #28a745;
+            border-left: 4px solid var(--success-color);
+            opacity: 0.9;
+            transition: background 0.3s;
         }
 
         footer {
@@ -372,17 +512,18 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #dc3545;
+            background: var(--danger-color);
             color: white;
             border: none;
             padding: 15px 25px;
             border-radius: 8px;
             font-size: 1.1em;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px var(--card-shadow);
             z-index: 1000;
             animation: blink 1.5s infinite;
             display: none;
+            transition: background 0.3s, transform 0.3s;
         }
 
         /* Black Swan Critical Banner */
@@ -457,7 +598,8 @@
         }
 
         .alert-button:hover {
-            background: #c82333;
+            background: var(--danger-color);
+            opacity: 0.9;
             transform: scale(1.05);
         }
 
@@ -470,8 +612,9 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.6);
+            background-color: var(--modal-overlay);
             animation: fadeIn 0.3s;
+            transition: background-color 0.3s;
         }
 
         @keyframes fadeIn {
@@ -480,17 +623,18 @@
         }
 
         .modal-content {
-            background-color: white;
+            background-color: var(--modal-bg);
             margin: 5% auto;
             padding: 0;
             border-radius: 10px;
             width: 80%;
             max-width: 800px;
             max-height: 80vh;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 16px var(--card-shadow);
             animation: slideDown 0.3s;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s;
         }
 
         @keyframes slideDown {
@@ -505,16 +649,17 @@
         }
 
         .modal-header {
-            border-bottom: 2px solid #dc3545;
+            border-bottom: 2px solid var(--danger-color);
             padding: 20px 30px;
             margin: 0;
-            background: white;
+            background: var(--modal-bg);
             border-radius: 10px 10px 0 0;
             flex-shrink: 0;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .modal-header h2 {
-            color: #dc3545;
+            color: var(--danger-color);
             margin: 0;
         }
 
@@ -525,29 +670,31 @@
         }
 
         .close {
-            color: #aaa;
+            color: var(--text-tertiary);
             float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
             line-height: 1;
+            transition: color 0.3s;
         }
 
         .close:hover,
         .close:focus {
-            color: #000;
+            color: var(--text-primary);
         }
 
         .failure-detail {
-            background: #f8f9fa;
+            background: var(--stat-box-bg);
             padding: 20px;
             border-radius: 6px;
             margin: 15px 0;
-            border-left: 4px solid #dc3545;
+            border-left: 4px solid var(--danger-color);
+            transition: background 0.3s, border-color 0.3s;
         }
 
         .failure-detail h3 {
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 10px;
             font-size: 1.1em;
         }
@@ -555,11 +702,12 @@
         .failure-detail p {
             margin: 8px 0;
             line-height: 1.6;
+            color: var(--text-primary);
         }
 
         .failure-detail.processed {
-            background: #e8f5e9;
-            border-left-color: #28a745;
+            background: var(--stat-box-bg);
+            border-left-color: var(--success-color);
             opacity: 0.6;
         }
 
@@ -658,9 +806,9 @@
 
         /* Ticket Filter Buttons */
         .filter-btn {
-            background: #f8f9fa;
-            color: #666;
-            border: 2px solid #e0e0e0;
+            background: var(--stat-box-bg);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
@@ -669,44 +817,42 @@
         }
 
         .filter-btn:hover {
-            background: #e9ecef;
-            border-color: #667eea;
+            background: var(--hover-bg);
+            border-color: var(--primary-color);
         }
 
         .filter-btn.active {
-            background: #667eea;
+            background: var(--primary-color);
             color: white;
-            border-color: #667eea;
+            border-color: var(--primary-color);
         }
 
         /* Ticket Cards */
         .ticket-card {
-            background: #f8f9fa;
+            background: var(--stat-box-bg);
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 15px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid var(--primary-color);
             transition: all 0.3s;
         }
 
         .ticket-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px var(--card-shadow);
             transform: translateX(5px);
         }
 
         .ticket-card.resolved {
             opacity: 0.7;
-            border-left-color: #28a745;
+            border-left-color: var(--success-color);
         }
 
         .ticket-card.critical {
-            border-left-color: #dc3545;
-            background: #fff5f5;
+            border-left-color: var(--danger-color);
         }
 
         .ticket-card.high {
-            border-left-color: #fd7e14;
-            background: #fff9f5;
+            border-left-color: var(--warning-color);
         }
 
         .ticket-header {
@@ -718,7 +864,7 @@
 
         .ticket-id {
             font-weight: bold;
-            color: #667eea;
+            color: var(--primary-color);
             font-size: 1.1em;
         }
 
@@ -731,12 +877,12 @@
         }
 
         .ticket-status.open {
-            background: #ffc107;
-            color: #333;
+            background: var(--warning-color);
+            color: var(--badge-text-dark);
         }
 
         .ticket-status.resolved {
-            background: #28a745;
+            background: var(--success-color);
             color: white;
         }
 
@@ -746,10 +892,11 @@
             gap: 10px;
             margin-bottom: 12px;
             font-size: 0.95em;
+            color: var(--text-primary);
         }
 
         .ticket-description {
-            color: #555;
+            color: var(--text-secondary);
             margin-bottom: 15px;
             line-height: 1.6;
         }
@@ -763,7 +910,7 @@
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #999;
+            color: var(--text-tertiary);
         }
 
         .empty-state-icon {
@@ -864,13 +1011,20 @@
         </div>
 
         <header>
-            <h1>🤖 Intelligent Manufacturing Dashboard</h1>
-            <p class="subtitle">
-                ML-Powered Component Failure Risk Analysis
-                <span class="badge">AWS Serverless</span>
-                <span class="badge" style="background: #764ba2;">ML Predictions</span>
-                <span class="badge" id="connectionStatus" style="background: #6c757d;">⚪ Offline Mode</span>
-            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>🤖 Intelligent Manufacturing Dashboard</h1>
+                    <p class="subtitle">
+                        ML-Powered Component Failure Risk Analysis
+                        <span class="badge">AWS Serverless</span>
+                        <span class="badge" style="background: #764ba2;">ML Predictions</span>
+                        <span class="badge" id="connectionStatus" style="background: #6c757d;">⚪ Offline Mode</span>
+                    </p>
+                </div>
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark/light mode">
+                    🌙
+                </button>
+            </div>
         </header>
 
         <div id="statusMessage"></div>
@@ -945,6 +1099,52 @@
     </div>
 
     <script>
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggle').textContent = '☀️';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (body.classList.contains('dark-theme')) {
+                body.classList.remove('dark-theme');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.add('dark-theme');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+            
+            // Update chart colors if chart exists
+            if (riskChart) {
+                updateChartTheme();
+            }
+        }
+
+        function updateChartTheme() {
+            const isDark = document.body.classList.contains('dark-theme');
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const textColor = isDark ? '#b8b8b8' : '#666';
+            
+            riskChart.options.scales.y.grid.color = gridColor;
+            riskChart.options.scales.x.grid.color = gridColor;
+            riskChart.options.scales.y.ticks.color = textColor;
+            riskChart.options.scales.x.ticks.color = textColor;
+            riskChart.options.plugins.legend.labels.color = textColor;
+            
+            riskChart.update();
+        }
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initTheme);
+
         // Global variables
         let allRecords = [];
         let currentRecords = [];
@@ -1087,7 +1287,8 @@
                             labels: {
                                 font: {
                                     size: 14
-                                }
+                                },
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim()
                             }
                         },
                         tooltip: {
@@ -1125,12 +1326,17 @@
                                 font: {
                                     size: 14,
                                     weight: 'bold'
-                                }
+                                },
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim()
                             },
                             ticks: {
                                 font: {
                                     size: 12
-                                }
+                                },
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim()
+                            },
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim()
                             }
                         },
                         x: {
@@ -1140,15 +1346,18 @@
                                 font: {
                                     size: 14,
                                     weight: 'bold'
-                                }
+                                },
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim()
                             },
                             ticks: {
                                 display: false,
                                 maxRotation: 0,
-                                minRotation: 0
+                                minRotation: 0,
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim()
                             },
                             grid: {
-                                display: false
+                                display: false,
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim()
                             }
                         }
                     }
