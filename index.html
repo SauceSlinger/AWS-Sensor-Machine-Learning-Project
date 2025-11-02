@@ -23,6 +23,11 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            transition: margin-top 0.3s;
+        }
+
+        .container.black-swan-active {
+            margin-top: 100px;
         }
 
         header {
@@ -337,6 +342,67 @@
             display: none;
         }
 
+        /* Black Swan Critical Banner */
+        .black-swan-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            z-index: 9999;
+            border-bottom: 4px solid #FFD700;
+            display: none;
+            animation: urgentPulse 1s infinite;
+        }
+
+        .black-swan-banner .banner-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .black-swan-banner .banner-message {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .black-swan-banner .banner-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .black-swan-banner button {
+            background: #FFD700;
+            color: #8B0000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .black-swan-banner button:hover {
+            background: #FFC700;
+            transform: scale(1.05);
+        }
+
+        @keyframes urgentPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
         @keyframes blink {
             0%, 50%, 100% { opacity: 1; }
             25%, 75% { opacity: 0.4; }
@@ -549,6 +615,20 @@
     </style>
 </head>
 <body>
+    <!-- Black Swan Critical Event Banner -->
+    <div id="blackSwanBanner" class="black-swan-banner">
+        <div class="banner-content">
+            <div class="banner-message">
+                🚨🚨 CATASTROPHIC EVENT: <span id="blackSwanCount">0</span> CRITICAL SENSOR FAILURES DETECTED 🚨🚨
+            </div>
+            <div class="banner-actions">
+                <button onclick="showFailureModal(activeFailures)">VIEW ALL FAILURES</button>
+                <button onclick="isolateAllCritical()">ISOLATE ALL</button>
+                <button onclick="createMassIncident()">CREATE MASS INCIDENT</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Alert Button (hidden by default) -->
         <button id="alertButton" class="alert-button">
@@ -909,23 +989,71 @@
                 let failedCount = 0;
                 let successfulAPICalls = 0;
                 
-                // Create sensor data array
+                // Determine if this is a "black swan" event (5% chance)
+                const isBlackSwan = Math.random() < 0.05;
+                
+                // Create sensor data array with realistic risk distribution
                 const sensorDataArray = [];
                 
                 for (let i = 0; i < 50; i++) {
                     let temp, vibration, pressure, speed;
                     
-                    // Create 2-3 failing sensors with extreme values
-                    if (i === 5 || i === 12 || i === 23) {
-                        temp = 115 + Math.random() * 10;
-                        vibration = 8 + Math.random() * 2;
-                        pressure = 95 + Math.random() * 3;
-                        speed = 1400 + Math.random() * 100;
+                    // Black Swan Event: 30-40% failing sensors (catastrophic scenario)
+                    if (isBlackSwan) {
+                        const rand = Math.random();
+                        if (rand < 0.35) {
+                            // 35% Critical (red) - Major failures
+                            temp = 110 + Math.random() * 15;
+                            vibration = 7 + Math.random() * 3;
+                            pressure = 92 + Math.random() * 3;
+                            speed = 1350 + Math.random() * 100;
+                        } else if (rand < 0.55) {
+                            // 20% High risk (orange) - Degrading
+                            temp = 95 + Math.random() * 15;
+                            vibration = 5 + Math.random() * 2;
+                            pressure = 94 + Math.random() * 4;
+                            speed = 1400 + Math.random() * 150;
+                        } else if (rand < 0.75) {
+                            // 20% Medium risk (yellow) - Concern
+                            temp = 80 + Math.random() * 15;
+                            vibration = 3.5 + Math.random() * 1.5;
+                            pressure = 96 + Math.random() * 5;
+                            speed = 1450 + Math.random() * 150;
+                        } else {
+                            // 25% Low risk (green) - Normal
+                            temp = 65 + Math.random() * 15;
+                            vibration = 1.5 + Math.random() * 2;
+                            pressure = 97 + Math.random() * 5;
+                            speed = 1500 + Math.random() * 150;
+                        }
                     } else {
-                        temp = 60 + Math.random() * 50;
-                        vibration = 0.5 + Math.random() * 4;
-                        pressure = 95 + Math.random() * 10;
-                        speed = 1400 + Math.random() * 200;
+                        // Normal Operations: Healthy distribution with rare failures
+                        const rand = Math.random();
+                        if (rand < 0.02) {
+                            // 2% Critical (red) - Very rare failures
+                            temp = 110 + Math.random() * 15;
+                            vibration = 7 + Math.random() * 3;
+                            pressure = 92 + Math.random() * 3;
+                            speed = 1350 + Math.random() * 100;
+                        } else if (rand < 0.06) {
+                            // 4% High risk (orange) - Uncommon degradation
+                            temp = 95 + Math.random() * 15;
+                            vibration = 5 + Math.random() * 2;
+                            pressure = 94 + Math.random() * 4;
+                            speed = 1400 + Math.random() * 150;
+                        } else if (rand < 0.20) {
+                            // 14% Medium risk (yellow) - Some monitoring needed
+                            temp = 80 + Math.random() * 15;
+                            vibration = 3.5 + Math.random() * 1.5;
+                            pressure = 96 + Math.random() * 5;
+                            speed = 1450 + Math.random() * 150;
+                        } else {
+                            // 80% Low risk (green) - Healthy majority
+                            temp = 60 + Math.random() * 20;
+                            vibration = 1.0 + Math.random() * 2.5;
+                            pressure = 97 + Math.random() * 5;
+                            speed = 1500 + Math.random() * 150;
+                        }
                     }
                     
                     sensorDataArray.push({
@@ -936,6 +1064,12 @@
                         speed: parseFloat(speed.toFixed(0)),
                         index: i
                     });
+                }
+                
+                // Show black swan warning if applicable
+                if (isBlackSwan) {
+                    showMessage('⚠️ BLACK SWAN EVENT DETECTED: Multiple critical failures in progress!', 'error');
+                    console.warn('🚨 BLACK SWAN EVENT: Simulating catastrophic failure scenario');
                 }
                 
                 showMessage(`⏳ Processing ${sensorDataArray.length} sensor predictions from AWS Lambda (batched for reliability)...`, 'success');
@@ -998,6 +1132,18 @@
                 // Sort by risk score (highest first)
                 allResults.sort((a, b) => b.failure_risk_score - a.failure_risk_score);
                 
+                // Calculate distribution breakdown for logging
+                const critical = allResults.filter(r => r.failure_risk_score >= 0.7).length;
+                const high = allResults.filter(r => r.failure_risk_score >= 0.4 && r.failure_risk_score < 0.7).length;
+                const medium = allResults.filter(r => r.failure_risk_score >= 0.2 && r.failure_risk_score < 0.4).length;
+                const low = allResults.filter(r => r.failure_risk_score < 0.2).length;
+                
+                console.log(`📊 Risk Distribution: 🔴 Critical: ${critical} (${(critical/50*100).toFixed(1)}%) | 🟠 High: ${high} (${(high/50*100).toFixed(1)}%) | 🟡 Medium: ${medium} (${(medium/50*100).toFixed(1)}%) | 🟢 Low: ${low} (${(low/50*100).toFixed(1)}%)`);
+                
+                if (isBlackSwan) {
+                    console.warn(`🚨 BLACK SWAN EVENT ACTIVE - Catastrophic failure scenario simulated`);
+                }
+                
                 const passRate = ((50 - failedCount) / 50 * 100).toFixed(1);
                 
                 const response = {
@@ -1021,6 +1167,15 @@
 
                 // Show alert if there are failures
                 if (response.failed_records && response.failed_records.length > 0) {
+                    // Check if this is a black swan event (>10 critical failures = >20%)
+                    const isBlackSwanResult = response.failed_records.length > 10;
+                    
+                    if (isBlackSwanResult) {
+                        // Enhanced alert for black swan events
+                        showMessage(`🚨 BLACK SWAN EVENT: ${response.failed_records.length} CRITICAL FAILURES DETECTED! Immediate action required!`, 'error');
+                        console.error(`🚨 CATASTROPHIC EVENT: ${response.failed_records.length} sensors in critical failure state`);
+                    }
+                    
                     showFailureAlert(response.failed_records);
                 } else {
                     hideFailureAlert();
@@ -1057,6 +1212,14 @@
             activeFailures = failedRecords.filter(f => !processedFailures.includes(f.serial_number));
             
             const alertBtn = document.getElementById('alertButton');
+            const isBlackSwan = failedRecords.length > 10; // >20% critical failure rate
+            
+            // Handle black swan banner
+            if (isBlackSwan && activeFailures.length > 0) {
+                showBlackSwanBanner(failedRecords.length);
+            } else {
+                hideBlackSwanBanner();
+            }
             
             if (activeFailures.length === 0) {
                 // All failures processed
@@ -1065,12 +1228,27 @@
                 alertBtn.style.animation = 'none';
                 alertBtn.textContent = `✅ ALL FAILURES PROCESSED - SYSTEM STABLE`;
                 alertBtn.onclick = () => showStatusSummary();
+                hideBlackSwanBanner();
             } else {
                 // Active failures remain
                 alertBtn.style.display = 'block';
-                alertBtn.style.background = '#dc3545';
-                alertBtn.style.animation = 'blink 1.5s infinite';
-                alertBtn.textContent = `🚨 ${activeFailures.length} ACTIVE FAILURE${activeFailures.length > 1 ? 'S' : ''} - ${processedFailures.length} PROCESSED`;
+                
+                if (isBlackSwan) {
+                    // BLACK SWAN EVENT - Ultra severe styling
+                    alertBtn.style.background = '#8B0000'; // Dark red
+                    alertBtn.style.animation = 'blink 0.75s infinite'; // Faster blink
+                    alertBtn.style.fontWeight = 'bold';
+                    alertBtn.style.fontSize = '16px';
+                    alertBtn.textContent = `🚨🚨 BLACK SWAN: ${activeFailures.length} CRITICAL FAILURES - IMMEDIATE ACTION REQUIRED 🚨🚨`;
+                } else {
+                    // Normal failure alert
+                    alertBtn.style.background = '#dc3545';
+                    alertBtn.style.animation = 'blink 1.5s infinite';
+                    alertBtn.style.fontWeight = 'normal';
+                    alertBtn.style.fontSize = '14px';
+                    alertBtn.textContent = `🚨 ${activeFailures.length} ACTIVE FAILURE${activeFailures.length > 1 ? 'S' : ''} - ${processedFailures.length} PROCESSED`;
+                }
+                
                 alertBtn.onclick = () => showFailureModal(failedRecords);
             }
         }
@@ -1078,6 +1256,59 @@
         // Hide failure alert
         function hideFailureAlert() {
             document.getElementById('alertButton').style.display = 'none';
+        }
+
+        // Show black swan banner
+        function showBlackSwanBanner(failureCount) {
+            const banner = document.getElementById('blackSwanBanner');
+            const countElement = document.getElementById('blackSwanCount');
+            const container = document.querySelector('.container');
+            
+            countElement.textContent = failureCount;
+            banner.style.display = 'block';
+            container.classList.add('black-swan-active');
+        }
+
+        // Hide black swan banner
+        function hideBlackSwanBanner() {
+            const banner = document.getElementById('blackSwanBanner');
+            const container = document.querySelector('.container');
+            
+            banner.style.display = 'none';
+            container.classList.remove('black-swan-active');
+        }
+
+        // Isolate all critical sensors (black swan action)
+        function isolateAllCritical() {
+            if (!activeFailures || activeFailures.length === 0) return;
+            
+            activeFailures.forEach(failure => {
+                if (!processedFailures.includes(failure.serial_number)) {
+                    processedFailures.push(failure.serial_number);
+                }
+            });
+            
+            showMessage(`✅ ALL ${activeFailures.length} CRITICAL SENSORS ISOLATED FROM PRODUCTION`, 'success');
+            showFailureAlert([]); // Update UI to show all processed
+            console.log(`🔒 Isolated ${activeFailures.length} critical sensors from production line`);
+        }
+
+        // Create mass incident ticket (black swan action)
+        function createMassIncident() {
+            if (!activeFailures || activeFailures.length === 0) return;
+            
+            const incidentId = 'INC-' + Date.now();
+            showMessage(`🎫 MASS INCIDENT CREATED: ${incidentId} for ${activeFailures.length} critical failures`, 'success');
+            console.log(`📋 Created mass incident ${incidentId} covering sensors: ${activeFailures.map(f => f.serial_number).join(', ')}`);
+            
+            // Mark all as processed
+            activeFailures.forEach(failure => {
+                if (!processedFailures.includes(failure.serial_number)) {
+                    processedFailures.push(failure.serial_number);
+                }
+            });
+            
+            showFailureAlert([]); // Update UI
         }
 
         // Show status summary when all failures are processed
