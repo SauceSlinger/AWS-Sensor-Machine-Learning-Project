@@ -909,8 +909,8 @@
                 let failedCount = 0;
                 let successfulAPICalls = 0;
                 
-                // Create batch of sensor data
-                const sensorPromises = [];
+                // Create sensor data array
+                const sensorDataArray = [];
                 
                 for (let i = 0; i < 50; i++) {
                     let temp, vibration, pressure, speed;
@@ -928,15 +928,26 @@
                         speed = 1400 + Math.random() * 200;
                     }
                     
-                    const sensorData = {
+                    sensorDataArray.push({
                         sensor_id: `SN-${100000 + i}`,
                         temperature: parseFloat(temp.toFixed(1)),
                         vibration: parseFloat(vibration.toFixed(2)),
                         pressure: parseFloat(pressure.toFixed(1)),
-                        speed: parseFloat(speed.toFixed(0))
-                    };
+                        speed: parseFloat(speed.toFixed(0)),
+                        index: i
+                    });
+                }
+                
+                showMessage(`⏳ Processing ${sensorDataArray.length} sensor predictions from AWS Lambda (batched for reliability)...`, 'success');
+                
+                // Process in batches of 10 to avoid overwhelming API Gateway
+                const allResults = [];
+                const batchSize = 10;
+                
+                for (let batchStart = 0; batchStart < sensorDataArray.length; batchStart += batchSize) {
+                    const batch = sensorDataArray.slice(batchStart, batchStart + batchSize);
                     
-                    sensorPromises.push(
+                    const batchPromises = batch.map(sensorData => 
                         fetch(API_GATEWAY_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -961,7 +972,7 @@
                             if (validationStatus === 'FAIL') failedCount++;
                             
                             return {
-                                timestamp: new Date(now.getTime() - i * 600000).toISOString().slice(0, 19).replace('T', ' '),
+                                timestamp: new Date(now.getTime() - sensorData.index * 600000).toISOString().slice(0, 19).replace('T', ' '),
                                 serial_number: sensorData.sensor_id,
                                 component_temp_C: sensorData.temperature,
                                 vibration_level: sensorData.vibration,
@@ -974,12 +985,17 @@
                             throw err;
                         })
                     );
+                    
+                    const batchResults = await Promise.all(batchPromises);
+                    allResults.push(...batchResults);
+                    
+                    console.log(`Processed batch ${Math.floor(batchStart / batchSize) + 1}/${Math.ceil(sensorDataArray.length / batchSize)} (${allResults.length}/${sensorDataArray.length} total)`);
+                    
+                    // Small delay between batches (100ms) to avoid rate limiting
+                    if (batchStart + batchSize < sensorDataArray.length) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
                 }
-                
-                showMessage(`⏳ Processing ${sensorPromises.length} sensor predictions from AWS Lambda...`, 'success');
-                
-                // Wait for all predictions
-                const allResults = await Promise.all(sensorPromises);
                 
                 console.log(`Successfully received ${successfulAPICalls} predictions from AWS Lambda`);
                 
