@@ -1,6 +1,10 @@
 🤖 Intelligent Operations Data Pipeline (AWS Serverless + ML)
+<img width="1920" height="1080" alt="awsIsolateDash" src="https://github.com/user-attachments/assets/2b0961eb-a2ad-4e6b-88dc-5517687c50f9" />
 
 This project showcases a Full-Stack Operations Engineer's ability to deploy machine learning models in a serverless environment to enhance quality control and process monitoring. It is architected for maximum efficiency and strict compliance with the AWS Free Tier.
+<img width="1920" height="1080" alt="AWSmonitor" src="https://github.com/user-attachments/assets/d5392396-b369-4501-9e02-aeb664ec2eaa" />
+<img width="1920" height="1080" alt="awsIcket" src="https://github.com/user-attachments/assets/d3602721-f63b-4ac6-aaae-7162b922bd3a" />
+<img width="1920" height="1080" alt="awsDarkDash" src="https://github.com/user-attachments/assets/05fb8de4-e303-4108-abdf-791da9ec7dae" />
 
 Development Note: This project was developed with the assistance of Gemini and GitHub Copilot for rapid code generation and troubleshooting, demonstrating proficiency with modern AI-driven development workflows.
 
